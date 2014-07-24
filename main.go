@@ -16,6 +16,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/go-fsnotify/fsnotify"
 	"github.com/shurcooL/go/github_flavored_markdown"
+	"github.com/skratchdot/open-golang/open"
 )
 
 const VERSION string = "0.1"
@@ -166,6 +167,9 @@ func main() {
 	app.Version = VERSION
 	app.Usage = "markdown live previewer"
 	app.Action = execCmd
+
+	/* open webbrowser */
+	open.Start("http://0.0.0.0:8089")
 
 	app.Run(os.Args)
 }
