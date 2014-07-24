@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 
@@ -129,7 +130,8 @@ func execCmd(c *cli.Context) {
 	go fileWatcher(ch)
 
 	/* for static files */
-	fs := http.FileServer(http.Dir("static"))
+	staticFilePath := path.Join(os.Getenv("GOPATH"), "src/github.com/hhatto/ftcat/static")
+	fs := http.FileServer(http.Dir(staticFilePath))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	/* index */
