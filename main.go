@@ -124,6 +124,9 @@ func execCmd(c *cli.Context) {
 		return
 	}
 
+	/* open webbrowser */
+	open.Start("http://0.0.0.0:8089")
+
 	ch := make(chan string)
 	gChan = make(chan string)
 
@@ -167,9 +170,6 @@ func main() {
 	app.Version = VERSION
 	app.Usage = "markdown live previewer"
 	app.Action = execCmd
-
-	/* open webbrowser */
-	open.Start("http://0.0.0.0:8089")
 
 	app.Run(os.Args)
 }
