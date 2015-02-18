@@ -15,6 +15,7 @@ import (
 	"github.com/antage/eventsource"
 	"github.com/codegangsta/cli"
 	"github.com/go-fsnotify/fsnotify"
+	"github.com/hhatto/gorst"
 	"github.com/shurcooL/go/github_flavored_markdown"
 	"github.com/skratchdot/open-golang/open"
 )
@@ -53,6 +54,34 @@ const indexTemplateHTML = `<!doctype html>
 var targetFileName string
 var gChan chan string
 
+func getContentString(filename string) (output string, err error) {
+	ext := filepath.Ext(filename)
+	if ext == ".md" {
+		var input []byte
+		if input, err = ioutil.ReadFile(targetFileName); err != nil {
+			log.Println("indexHandler: ", err)
+			return "", err
+		}
+		o := github_flavored_markdown.Markdown(input)
+		outputBuffer := bytes.NewBuffer(o)
+		output = outputBuffer.String()
+	} else {
+		// rst
+		input, err := os.Open(filename)
+		if err != nil {
+			log.Printf("%v", err)
+			return "", err
+		}
+		defer input.Close()
+		var buf bytes.Buffer
+		p := rst.NewParser(nil)
+		html := rst.ToHTML(&buf)
+		p.ReStructuredText(input, html)
+		output = buf.String()
+	}
+	return output, err
+}
+
 func fileWatcher(ch chan string) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -75,13 +104,8 @@ func fileWatcher(ch chan string) {
 				continue
 			}
 			log.Println("modified file:", event, event.Name)
-			if input, err := ioutil.ReadFile(event.Name); err == nil {
-				output := github_flavored_markdown.Markdown(input)
-				outputBuffer := bytes.NewBuffer(output)
-				ch <- outputBuffer.String()
-			} else {
-				log.Println("ReadFile error:", err)
-			}
+			output, _ := getContentString(event.Name)
+			ch <- output
 		case err := <-watcher.Errors:
 			log.Println("error:", err)
 		}
@@ -95,13 +119,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var input []byte
-	if input, err = ioutil.ReadFile(targetFileName); err != nil {
-		log.Println("indexHandler: ", err)
+	output, err := getContentString(targetFileName)
+	if err != nil {
 		return
 	}
-	output := github_flavored_markdown.Markdown(input)
-	outputBuffer := bytes.NewBuffer(output)
 	var indexObj struct {
 		Filename string
 		Dirname  string
@@ -109,13 +130,13 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	indexObj.Filename = filepath.Base(targetFileName)
 	indexObj.Dirname = filepath.Dir(targetFileName)
-	indexObj.Contents = outputBuffer.String()
+	indexObj.Contents = output
 	err = t.Execute(w, indexObj)
 	if err != nil {
 		log.Println("indexHandler: ", err)
 	}
 
-	gChan <- outputBuffer.String()
+	gChan <- output
 }
 
 func execCmd(c *cli.Context) {
