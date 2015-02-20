@@ -1,6 +1,6 @@
 # ftcat (faster than cat([meow](https://github.com/hhatto/meow)))
 
-Markdown live previewer
+Markdown/reStructuredText live previewer
 
 ## Installation
 ```sh
