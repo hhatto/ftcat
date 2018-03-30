@@ -14,7 +14,7 @@ import (
 
 	"github.com/antage/eventsource"
 	"github.com/codegangsta/cli"
-	"github.com/go-fsnotify/fsnotify"
+	"github.com/fsnotify/fsnotify"
 	"github.com/hhatto/gorst"
 	"github.com/shurcooL/github_flavored_markdown"
 	"github.com/skratchdot/open-golang/open"
