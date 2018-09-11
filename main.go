@@ -140,11 +140,9 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	var indexObj struct {
 		Filename string
 		Dirname  string
-		Contents string
 	}
 	indexObj.Filename = filepath.Base(targetFileName)
 	indexObj.Dirname = filepath.Dir(targetFileName)
-	indexObj.Contents = output
 	err = t.Execute(w, indexObj)
 	if err != nil {
 		log.Println("indexHandler: ", err)
@@ -155,7 +153,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func execCmd(c *cli.Context) {
 	if len(c.Args()) < 1 {
-		fmt.Println("Specify Markdown file")
+		fmt.Println("usage: ftcat FILE")
 		return
 	}
 
@@ -164,13 +162,7 @@ func execCmd(c *cli.Context) {
 	targetFileName = c.Args()[0]
 
 	/* open webbrowser */
-	go func() {
-		open.Start("http://0.0.0.0:8089")
-
-		time.Sleep(500 * time.Millisecond)
-		output, _ := getContentString(targetFileName)
-		ch <- output
-	}()
+	open.Start("http://0.0.0.0:8089")
 
 	go fileWatcher(ch)
 
@@ -196,6 +188,7 @@ func execCmd(c *cli.Context) {
 				es.SendEventMessage(n, "cre", strconv.Itoa(id))
 				id++
 			case n := <-gChan:
+				time.Sleep(300 * time.Millisecond)
 				es.SendEventMessage(n, "cre", strconv.Itoa(id))
 				id++
 			}
