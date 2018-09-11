@@ -11,6 +11,7 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/antage/eventsource"
 	"github.com/codegangsta/cli"
@@ -158,13 +159,19 @@ func execCmd(c *cli.Context) {
 		return
 	}
 
-	/* open webbrowser */
-	open.Start("http://0.0.0.0:8089")
-
 	ch := make(chan string)
 	gChan = make(chan string)
-
 	targetFileName = c.Args()[0]
+
+	/* open webbrowser */
+	go func() {
+		open.Start("http://0.0.0.0:8089")
+
+		time.Sleep(500 * time.Millisecond)
+		output, _ := getContentString(targetFileName)
+		ch <- output
+	}()
+
 	go fileWatcher(ch)
 
 	/* for static files */
