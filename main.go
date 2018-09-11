@@ -15,6 +15,7 @@ import (
 	"github.com/antage/eventsource"
 	"github.com/codegangsta/cli"
 	"github.com/fsnotify/fsnotify"
+	scrapbox "github.com/hhatto/go-scrapbox-parser"
 	"github.com/hhatto/gorst"
 	"github.com/shurcooL/github_flavored_markdown"
 	"github.com/skratchdot/open-golang/open"
@@ -56,13 +57,25 @@ var gChan chan string
 
 func getContentString(filename string) (output string, err error) {
 	ext := filepath.Ext(filename)
+	var input []byte
 	if ext == ".md" {
-		var input []byte
 		if input, err = ioutil.ReadFile(targetFileName); err != nil {
 			log.Println("indexHandler: ", err)
 			return "", err
 		}
 		o := github_flavored_markdown.Markdown(input)
+		outputBuffer := bytes.NewBuffer(o)
+		output = outputBuffer.String()
+	} else if ext == ".sb" || ext == ".scrapbox" {
+		// scrapbox
+		p := scrapbox.NewParser()
+		input, err := os.Open(filename)
+		if err != nil {
+			log.Printf("%v", err)
+			return "", err
+		}
+		defer input.Close()
+		o := p.ToHTML(input)
 		outputBuffer := bytes.NewBuffer(o)
 		output = outputBuffer.String()
 	} else {
