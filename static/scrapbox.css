@@ -2,6 +2,7 @@
   font-size: 15px;
   line-height: 28px;
   padding: 24px 28px 24px;
+  max-width: 880px;
 }
 .markdown-body p {
   margin: 0;
