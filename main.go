@@ -29,7 +29,9 @@ const indexTemplateHTML = `<!doctype html>
   <meta charset='utf-8'/>
   <title>{{.Filename}} - {{.Dirname}}</title>
   <link rel="stylesheet" type="text/css" href="/static/github.min.css" />
+  {{if .IsScrapbox}}
   <link rel="stylesheet" type="text/css" href="/static/scrapbox.css" />
+  {{end}}
   <script>
     function startup() {
         var eventList = document.getElementById("eventList");
@@ -139,11 +141,16 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var indexObj struct {
-		Filename string
-		Dirname  string
+		Filename   string
+		Dirname    string
+		IsScrapbox bool
 	}
 	indexObj.Filename = filepath.Base(targetFileName)
 	indexObj.Dirname = filepath.Dir(targetFileName)
+	ext := filepath.Ext(targetFileName)
+	if ext == ".sb" || ext == ".scrapbox" {
+		indexObj.IsScrapbox = true
+	}
 	err = t.Execute(w, indexObj)
 	if err != nil {
 		log.Println("indexHandler: ", err)
