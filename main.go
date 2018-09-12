@@ -29,6 +29,7 @@ const indexTemplateHTML = `<!doctype html>
   <meta charset='utf-8'/>
   <title>{{.Filename}} - {{.Dirname}}</title>
   <link rel="stylesheet" type="text/css" href="/static/github.min.css" />
+  <link rel="stylesheet" type="text/css" href="/static/scrapbox.css" />
   <script>
     function startup() {
         var eventList = document.getElementById("eventList");
