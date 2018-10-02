@@ -11,10 +11,12 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/antage/eventsource"
 	"github.com/codegangsta/cli"
 	"github.com/fsnotify/fsnotify"
+	scrapbox "github.com/hhatto/go-scrapbox-parser"
 	"github.com/hhatto/gorst"
 	"github.com/shurcooL/github_flavored_markdown"
 	"github.com/skratchdot/open-golang/open"
@@ -27,6 +29,9 @@ const indexTemplateHTML = `<!doctype html>
   <meta charset='utf-8'/>
   <title>{{.Filename}} - {{.Dirname}}</title>
   <link rel="stylesheet" type="text/css" href="/static/github.min.css" />
+  {{if .IsScrapbox}}
+  <link rel="stylesheet" type="text/css" href="/static/scrapbox.css" />
+  {{end}}
   <style>
   pre { font-family: Consolas, 'Courier New', Courier, Monaco, monospace; }
   code { font-family: Consolas, 'Courier New', Courier, Monaco, monospace; }
@@ -60,13 +65,25 @@ var gChan chan string
 
 func getContentString(filename string) (output string, err error) {
 	ext := filepath.Ext(filename)
+	var input []byte
 	if ext == ".md" {
-		var input []byte
 		if input, err = ioutil.ReadFile(targetFileName); err != nil {
 			log.Println("indexHandler: ", err)
 			return "", err
 		}
 		o := github_flavored_markdown.Markdown(input)
+		outputBuffer := bytes.NewBuffer(o)
+		output = outputBuffer.String()
+	} else if ext == ".sb" || ext == ".scrapbox" {
+		// scrapbox
+		p := scrapbox.NewParser()
+		input, err := os.Open(filename)
+		if err != nil {
+			log.Printf("%v", err)
+			return "", err
+		}
+		defer input.Close()
+		o := p.ToHTML(input)
 		outputBuffer := bytes.NewBuffer(o)
 		output = outputBuffer.String()
 	} else {
@@ -128,13 +145,16 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var indexObj struct {
-		Filename string
-		Dirname  string
-		Contents string
+		Filename   string
+		Dirname    string
+		IsScrapbox bool
 	}
 	indexObj.Filename = filepath.Base(targetFileName)
 	indexObj.Dirname = filepath.Dir(targetFileName)
-	indexObj.Contents = output
+	ext := filepath.Ext(targetFileName)
+	if ext == ".sb" || ext == ".scrapbox" {
+		indexObj.IsScrapbox = true
+	}
 	err = t.Execute(w, indexObj)
 	if err != nil {
 		log.Println("indexHandler: ", err)
@@ -145,17 +165,17 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func execCmd(c *cli.Context) {
 	if len(c.Args()) < 1 {
-		fmt.Println("Specify Markdown file")
+		fmt.Println("usage: ftcat FILE")
 		return
 	}
+
+	ch := make(chan string)
+	gChan = make(chan string)
+	targetFileName = c.Args()[0]
 
 	/* open webbrowser */
 	open.Start("http://0.0.0.0:8089")
 
-	ch := make(chan string)
-	gChan = make(chan string)
-
-	targetFileName = c.Args()[0]
 	go fileWatcher(ch)
 
 	/* for static files */
@@ -180,6 +200,7 @@ func execCmd(c *cli.Context) {
 				es.SendEventMessage(n, "cre", strconv.Itoa(id))
 				id++
 			case n := <-gChan:
+				time.Sleep(300 * time.Millisecond)
 				es.SendEventMessage(n, "cre", strconv.Itoa(id))
 				id++
 			}
