@@ -27,6 +27,10 @@ const indexTemplateHTML = `<!doctype html>
   <meta charset='utf-8'/>
   <title>{{.Filename}} - {{.Dirname}}</title>
   <link rel="stylesheet" type="text/css" href="/static/github.min.css" />
+  <style>
+  pre { font-family: Consolas, 'Courier New', Courier, Monaco, monospace; }
+  code { font-family: Consolas, 'Courier New', Courier, Monaco, monospace; }
+  </style>
   <script>
     function startup() {
         var eventList = document.getElementById("eventList");
