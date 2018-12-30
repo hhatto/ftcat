@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"go/build"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -179,7 +180,11 @@ func execCmd(c *cli.Context) {
 	go fileWatcher(ch)
 
 	/* for static files */
-	staticFilePath := path.Join(os.Getenv("GOPATH"), "src/github.com/hhatto/ftcat/static")
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		gopath = build.Default.GOPATH
+	}
+	staticFilePath := path.Join(gopath, "src/github.com/hhatto/ftcat/static")
 	fs := http.FileServer(http.Dir(staticFilePath))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
