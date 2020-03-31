@@ -15,12 +15,12 @@ import (
 	"time"
 
 	"github.com/antage/eventsource"
-	"github.com/codegangsta/cli"
 	"github.com/fsnotify/fsnotify"
 	scrapbox "github.com/hhatto/go-scrapbox-parser"
-	"github.com/hhatto/gorst"
+	rst "github.com/hhatto/gorst"
 	"github.com/shurcooL/github_flavored_markdown"
 	"github.com/skratchdot/open-golang/open"
+	"github.com/urfave/cli/v2"
 )
 
 const VERSION string = "0.1"
@@ -164,15 +164,15 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	gChan <- output
 }
 
-func execCmd(c *cli.Context) {
-	if len(c.Args()) < 1 {
+func execCmd(c *cli.Context) error {
+	if c.Args().Len() < 1 {
 		fmt.Println("usage: ftcat FILE")
-		return
+		return nil
 	}
 
 	ch := make(chan string)
 	gChan = make(chan string)
-	targetFileName = c.Args()[0]
+	targetFileName = c.Args().Get(0)
 
 	/* open webbrowser */
 	open.Start("http://0.0.0.0:8089")
@@ -213,6 +213,8 @@ func execCmd(c *cli.Context) {
 	}()
 
 	log.Fatal(http.ListenAndServe(":8089", nil))
+
+	return nil
 }
 
 func main() {
