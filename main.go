@@ -20,7 +20,7 @@ import (
 	rst "github.com/hhatto/gorst"
 	"github.com/shurcooL/github_flavored_markdown"
 	"github.com/skratchdot/open-golang/open"
-	"github.com/urfave/cli/v2"
+	cli "github.com/urfave/cli/v2"
 )
 
 const VERSION string = "0.1"
