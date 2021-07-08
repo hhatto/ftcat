@@ -219,7 +219,7 @@ func execCmd(c *cli.Context) error {
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "baa"
+	app.Name = "ftcat"
 	app.Version = VERSION
 	app.Usage = "markdown live previewer"
 	app.Action = execCmd
