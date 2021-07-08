@@ -91,7 +91,7 @@ func getContentString(filename string) (output string, err error) {
 		// rst
 		input, err := os.Open(filename)
 		if err != nil {
-			log.Printf("%v", err)
+			log.Printf("os.Open: %v", err)
 			return "", err
 		}
 		defer input.Close()
@@ -107,12 +107,12 @@ func getContentString(filename string) (output string, err error) {
 func fileWatcher(ch chan string) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("fsnotify.NewWatcher: %v", err)
 	}
 	defer watcher.Close()
-	err = watcher.Add(filepath.Dir(targetFileName))
+	err = watcher.Add(targetFileName)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("watcher.Add: %v", err)
 	}
 
 	for {
