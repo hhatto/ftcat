@@ -4,7 +4,7 @@ Markdown/reStructuredText live previewer
 
 ## Installation
 ```sh
-go get github.com/hhatto/ftcat
+go install github.com/hhatto/ftcat@latest
 ```
 
 ## Usage
