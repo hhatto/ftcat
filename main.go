@@ -109,10 +109,15 @@ func fileWatcher(ch chan string) {
 		log.Fatalf("fsnotify.NewWatcher: %v", err)
 	}
 	defer watcher.Close()
-	err = watcher.Add(targetFileName)
+
+	dirPath := filepath.Dir(targetFileName)
+	err = watcher.Add(dirPath)
 	if err != nil {
 		log.Fatalf("watcher.Add: %v", err)
 	}
+
+	targetFileName = filepath.Base(targetFileName)
+	log.Printf("Watching %s", targetFileName)
 
 	for {
 		select {
