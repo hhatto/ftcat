@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"go/build"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -68,7 +67,7 @@ func getContentString(filename string) (output string, err error) {
 	ext := filepath.Ext(filename)
 	var input []byte
 	if ext == ".md" {
-		if input, err = ioutil.ReadFile(targetFileName); err != nil {
+		if input, err = os.ReadFile(targetFileName); err != nil {
 			log.Println("indexHandler: ", err)
 			return "", err
 		}
