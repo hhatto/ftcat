@@ -11,6 +11,7 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/antage/eventsource"
@@ -103,6 +104,13 @@ func getContentString(filename string) (output string, err error) {
 	return output, err
 }
 
+func isMatchFileName(eventFileName, inputFileName string) bool {
+	if strings.HasPrefix(inputFileName, "./") {
+		inputFileName = inputFileName[2:]
+	}
+	return eventFileName == inputFileName
+}
+
 func fileWatcher(ch chan string) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -116,13 +124,12 @@ func fileWatcher(ch chan string) {
 		log.Fatalf("watcher.Add: %v", err)
 	}
 
-	targetFileName = filepath.Base(targetFileName)
 	log.Printf("Watching %s", targetFileName)
 
 	for {
 		select {
 		case event := <-watcher.Events:
-			if event.Name != targetFileName {
+			if !isMatchFileName(event.Name, targetFileName) {
 				continue
 			}
 			if event.Op&fsnotify.Write != fsnotify.Write &&
