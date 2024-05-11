@@ -67,7 +67,7 @@ func getContentString(filename string) (output string, err error) {
 	ext := filepath.Ext(filename)
 	var input []byte
 	if ext == ".md" {
-		if input, err = os.ReadFile(targetFileName); err != nil {
+		if input, err = os.ReadFile(filename); err != nil {
 			log.Println("indexHandler: ", err)
 			return "", err
 		}
