@@ -9,14 +9,17 @@ require (
 	github.com/hhatto/gorst v0.0.0-20181029133204-ca9f730cac5b
 	github.com/shurcooL/github_flavored_markdown v0.0.0-20210228213109-c3a9aa474629
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
+	github.com/stretchr/testify v1.4.0
 	github.com/urfave/cli/v2 v2.3.0
 )
 
 require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.17 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/russross/blackfriday v1.6.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
