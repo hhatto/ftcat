@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/antage/eventsource v0.0.0-20190412115600-84b661236871
-	github.com/fsnotify/fsnotify v1.7.0
+	github.com/fsnotify/fsnotify v1.8.0
 	github.com/hhatto/go-scrapbox-parser v0.0.0-20180912165142-2680d50cd807
 	github.com/hhatto/gorst v0.0.0-20181029133204-ca9f730cac5b
 	github.com/shurcooL/github_flavored_markdown v0.0.0-20210228213109-c3a9aa474629
